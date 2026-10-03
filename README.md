@@ -1,5 +1,7 @@
 # ModelGate
 
+## Overview
+
 ModelGate is a small HTTP gateway for mock AI model inference. Clients can list available models and send a prompt to a selected model. The responses are generated locally; no provider account or API key is needed.
 
 ## Requirements
