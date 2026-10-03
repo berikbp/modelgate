@@ -1,0 +1,23 @@
+[project]
+name = "aigateaway"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Satybaldy Berik", email = "240107019@sdu.edu.kz" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.142.2",
+    "httpx>=0.28.1",
+    "httpx2>=2.13.1",
+    "pytest>=9.1.1",
+    "uvicorn>=0.54.0",
+]
+
+[project.scripts]
+aigateaway = "aigateaway:main"
+
+[build-system]
+requires = ["uv_build>=0.12.6,<0.13.0"]
+build-backend = "uv_build"
