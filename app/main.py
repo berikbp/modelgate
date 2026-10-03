@@ -41,7 +41,7 @@ def chat(request: ChatRequest):
     return {
         'model': model_name,
         'prompt': prompt,
-        'response': f"Response from {model_name} for prompt: {prompt}"
+        'response': f"Response from this {model_name} for prompt: {prompt}"
     }
 
 
