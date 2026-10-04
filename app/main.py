@@ -1,14 +1,11 @@
-from app.providers.base import BaseProvider
 from app.providers.mock import MockProvider
 from app.schemas import ChatRequest
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
 import uvicorn
 import os
 
 app = FastAPI(title='ModelGate')
 provider = MockProvider()
-MODELS = provider.list_models()
 
 @app.get("/")
 def get():
@@ -20,7 +17,7 @@ def health():
 
 @app.get('/v1/models')
 def get_models():
-    return {'models': MODELS}
+    return {'models': provider.list_models()}
 
 @app.post('/v1/chat')
 def chat(request: ChatRequest):
@@ -28,13 +25,14 @@ def chat(request: ChatRequest):
     prompt = request.prompt
 
     # Checking if the requested model is available
-    if model_name not in [model['name'] for model in MODELS]:
+    if model_name not in [model['name'] for model in provider.list_models()]:
         raise HTTPException(status_code=404, detail=f"Model {model_name} doesn't exist")
 
+    response = provider.generate_response(model_name, prompt)
     return {
         'model': model_name,
         'prompt': prompt,
-        'response': f"Response from this {model_name} for prompt: {prompt}"
+        'response': response
     }
 
 
