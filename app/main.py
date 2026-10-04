@@ -1,21 +1,14 @@
+from app.providers.base import BaseProvider
+from app.providers.mock import MockProvider
+from app.schemas import ChatRequest
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import uvicorn
 import os
 
 app = FastAPI(title='ModelGate')
-
-MODELS = [
-    {"name": "Claude", "version": "latest"},
-    {"name": "GPT-4", "version": "latest"},
-    {"name": "LLaMA", "version": "latest"},
-    {"name": "Mistral", "version": "latest"},
-    {"name": "Falcon", "version": "latest"}
-]
-
-class ChatRequest(BaseModel):
-    model: str
-    prompt: str
+provider = MockProvider()
+MODELS = provider.list_models()
 
 @app.get("/")
 def get():
