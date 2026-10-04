@@ -1,11 +1,13 @@
 from app.providers.mock import MockProvider
+from app.providers.registry import ProviderRegistry
 from app.schemas import ChatRequest
 from fastapi import FastAPI, HTTPException
 import uvicorn
 import os
 
 app = FastAPI(title='ModelGate')
-provider = MockProvider()
+provider = ProviderRegistry()
+provider.register("mock", MockProvider())
 
 @app.get("/")
 def get():
@@ -21,19 +23,15 @@ def get_models():
 
 @app.post('/v1/chat')
 def chat(request: ChatRequest):
-    model_name = request.model
-    prompt = request.prompt
-
-    # Checking if the requested model is available
-    if model_name not in [model['name'] for model in provider.list_models()]:
-        raise HTTPException(status_code=404, detail=f"Model {model_name} doesn't exist")
-
-    response = provider.generate_response(model_name, prompt)
-    return {
-        'model': model_name,
-        'prompt': prompt,
-        'response': response
-    }
+    try:
+        response = provider.generate_response(request.model, request.prompt)
+        return {
+            "model": request.model,
+            "prompt": request.prompt,
+            "response": response
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
 
 
 if __name__ == '__main__':
