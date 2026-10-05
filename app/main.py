@@ -1,4 +1,5 @@
 from app.providers.mock import MockProvider
+from app.providers.ollama import OllamaProvider
 from app.providers.registry import ProviderRegistry
 from app.schemas import ChatRequest
 from fastapi import FastAPI, HTTPException
@@ -8,7 +9,7 @@ import os
 app = FastAPI(title='ModelGate')
 provider = ProviderRegistry()
 provider.register("mock", MockProvider())
-
+provider.register("ollama", OllamaProvider())
 @app.get("/")
 def get():
     return {"message": "Hello, World!"}
