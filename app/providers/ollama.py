@@ -1,3 +1,10 @@
+'''
+so here initially using httpx.get() and httpx.post() to interact with the Ollama API. 
+but the problem is that when we try to access to the Ollama API,
+we always recreate the httpx client for each request, which is not efficient and can lead to performance issues.
+to fix this use reusable httpx client , which speeds up repeated API calls
+via connection pooling and keep-alive connections.
+'''
 import httpx
 
 from app.providers.base import BaseProvider
@@ -5,9 +12,10 @@ from app.providers.base import BaseProvider
 class OllamaProvider(BaseProvider):
     def __init__(self, base_url: str = "http://localhost:11434"):
         self.base_url = base_url
-
+        self.client = httpx.Client(base_url=self.base_url, timeout=60.0)
+        
     def list_models(self) -> list[dict]:
-        response = httpx.get(
+        response = self.client.get(
             f"{self.base_url}/api/tags",
             timeout=5.0,
         )
@@ -25,7 +33,7 @@ class OllamaProvider(BaseProvider):
         ]
 
     def generate_response(self, model: str, prompt: str) -> str:
-        response = httpx.post(
+        response = self.client.post(
             f'{self.base_url}/api/generate',
             json={
                 "model": model,
@@ -37,8 +45,6 @@ class OllamaProvider(BaseProvider):
 
         response.raise_for_status()
 
-        data = response.json()
-
-        return data["response"]
+        return response.json().get("response", "")
 
     
