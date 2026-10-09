@@ -10,7 +10,7 @@ def test_root():
 
 def test_health():
     response = client.get("/healthz")
-    assert response.status_code == 200
+    assert response.status_code == 201
     assert response.json() == {"status": "healthy"}
 
 def test_models():
