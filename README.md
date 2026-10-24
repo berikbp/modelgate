@@ -41,3 +41,45 @@ The script exits with a failure status if a test fails and prints `TESTS: 5/5` w
 - `GET /healthz` returns the service health status.
 - `GET /v1/models` lists the mock models.
 - `POST /v1/chat` accepts JSON such as `{"model":"GPT-4","prompt":"Hello"}` and returns a mock response.
+
+## Docker
+
+Build and start the image with a custom port:
+
+```bash
+docker build --platform linux/amd64 -t modelgate:dev .
+docker run -d --name modelgate -e PORT=9090 -p 9090:9090 modelgate:dev
+curl --fail http://localhost:9090/healthz
+docker stop modelgate
+docker rm modelgate
+```
+
+The runtime uses a non-root user and contains only Python, installed dependencies,
+and the application. `PORT` defaults to `8080`.
+
+Run the Compose health check and smoke test:
+
+```bash
+docker compose up --build --exit-code-from smoke
+docker compose down
+```
+
+## Container publishing
+
+Pull requests run the API tests. Pushes to `main` also build a Linux amd64 image,
+check `/healthz`, and scan for fixable critical vulnerabilities with Trivy. Only
+when these checks pass does CI publish the tested image using `GITHUB_TOKEN`:
+
+- `ghcr.io/berikbp/modelgate:<full-commit-sha>`
+- `ghcr.io/berikbp/modelgate:latest`
+
+After the first publish, set the GitHub package visibility to Public so anonymous
+users and the milestone marker can pull it. The workflow needs permission to
+write packages.
+
+Run the official marker after publishing:
+
+```bash
+curl -fLsS https://raw.githubusercontent.com/inf345/inf345-week6-lab/main/mark_m3.py -o /tmp/mark_m3.py
+python3 /tmp/mark_m3.py --repo https://github.com/berikbp/modelgate
+```

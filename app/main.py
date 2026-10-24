@@ -1,22 +1,15 @@
+from app.providers.mock import MockProvider
+from app.providers.ollama import OllamaProvider
+from app.providers.registry import ProviderRegistry
+from app.schemas import ChatRequest
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
 import uvicorn
 import os
 
 app = FastAPI(title='ModelGate')
-
-MODELS = [
-    {"name": "Claude", "version": "latest"},
-    {"name": "GPT-4", "version": "latest"},
-    {"name": "LLaMA", "version": "latest"},
-    {"name": "Mistral", "version": "latest"},
-    {"name": "Falcon", "version": "latest"}
-]
-
-class ChatRequest(BaseModel):
-    model: str
-    prompt: str
-
+provider = ProviderRegistry()
+provider.register("mock", MockProvider())
+provider.register("ollama", OllamaProvider())
 @app.get("/")
 def get():
     return {"message": "Hello, World!"}
@@ -27,22 +20,19 @@ def health():
 
 @app.get('/v1/models')
 def get_models():
-    return {'models': MODELS}
+    return {'models': provider.list_models()}
 
 @app.post('/v1/chat')
 def chat(request: ChatRequest):
-    model_name = request.model
-    prompt = request.prompt
-
-    # Checking if the requested model is available
-    if model_name not in [model['name'] for model in MODELS]:
-        raise HTTPException(status_code=404, detail=f"Model {model_name} doesn't exist")
-
-    return {
-        'model': model_name,
-        'prompt': prompt,
-        'response': f"Response from this {model_name} for prompt: {prompt}"
-    }
+    try:
+        response = provider.generate_response(request.model, request.prompt)
+        return {
+            "model": request.model,
+            "prompt": request.prompt,
+            "response": response
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
 
 
 if __name__ == '__main__':

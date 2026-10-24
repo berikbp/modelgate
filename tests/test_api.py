@@ -1,7 +1,17 @@
+import pytest
+from app.main import provider
+from app.providers.exceptions import ProviderUnavailableError
 from fastapi.testclient import TestClient
 from app.main import app
 
 client = TestClient(app)
+
+
+@pytest.fixture(autouse=True)
+def unavailable_ollama(monkeypatch):
+    def unavailable():
+        raise ProviderUnavailableError("Ollama is unavailable")
+    monkeypatch.setattr(provider.providers["ollama"], "list_models", unavailable)
 
 
 def test_root():
