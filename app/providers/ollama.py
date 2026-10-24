@@ -8,6 +8,7 @@ via connection pooling and keep-alive connections.
 import httpx
 
 from app.providers.base import BaseProvider
+from app.providers.exceptions import ProviderError, ProviderUnavailableError, ModelNotFoundError
 
 class OllamaProvider(BaseProvider):
     def __init__(self, base_url: str = "http://localhost:11434"):
@@ -15,12 +16,23 @@ class OllamaProvider(BaseProvider):
         self.client = httpx.Client(base_url=self.base_url, timeout=60.0)
         
     def list_models(self) -> list[dict]:
-        response = self.client.get(
-            f"{self.base_url}/api/tags",
-            timeout=5.0,
-        )
+        try:
+            response = self.client.get(
+                f"{self.base_url}/api/tags",
+                timeout=5.0,
+            )
 
-        response.raise_for_status()
+            response.raise_for_status()
+
+        except httpx.RequestError as error:
+            raise ProviderUnavailableError(
+                "Ollama is unavailable"
+            ) from error
+
+        except httpx.HTTPStatusError as error:
+            raise ProviderUnavailableError(
+                f"Ollama returned HTTP {error.response.status_code}"
+            ) from error
 
         data = response.json()
 
@@ -33,18 +45,34 @@ class OllamaProvider(BaseProvider):
         ]
 
     def generate_response(self, model: str, prompt: str) -> str:
-        response = self.client.post(
-            f'{self.base_url}/api/generate',
-            json={
-                "model": model,
-                "prompt": prompt,
-                "stream": False,
-            },
-            timeout=60.0,
-        )
+        try:
+            response = self.client.post(
+                f"{self.base_url}/api/generate",
+                json={
+                    "model": model,
+                    "prompt": prompt,
+                    "stream": False,
+                },
+                timeout=60.0,
+            )
 
-        response.raise_for_status()
+            if response.status_code == 404:
+                raise ModelNotFoundError(
+                    f"Model {model} doesn't exist in Ollama"
+                )
 
-        return response.json().get("response", "")
+            response.raise_for_status()
 
-    
+        except httpx.RequestError as error:
+            raise ProviderUnavailableError(
+                "Ollama is unavailable"
+            ) from error
+
+        except httpx.HTTPStatusError as error:
+            raise ProviderUnavailableError(
+                f"Ollama returned HTTP {error.response.status_code}"
+            ) from error
+
+        data = response.json()
+
+        return data["response"]

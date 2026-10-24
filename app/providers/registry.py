@@ -1,4 +1,5 @@
 from app.providers.base import BaseProvider
+from app.providers.exceptions import ProviderUnavailableError
 
 class ProviderRegistry:
     def __init__(self):
@@ -12,7 +13,11 @@ class ProviderRegistry:
         models = []
 
         for provider_name, provider in self.providers.items():
-            for model in provider.list_models():
+            try:
+                available_models = provider.list_models()
+            except ProviderUnavailableError:
+                continue
+            for model in available_models:
                 models.append(
                     {
                         **model,
@@ -24,10 +29,10 @@ class ProviderRegistry:
 
     def get_provider_for_model(self, model_name: str) -> BaseProvider:
         for provider in self.providers.values():
-            model_names = [
-                model["name"]
-                for model in provider.list_models()
-            ]
+            try:
+                model_names = [model["name"] for model in provider.list_models()]
+            except ProviderUnavailableError:
+                continue
 
             if model_name in model_names:
                 return provider

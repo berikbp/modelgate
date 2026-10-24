@@ -1,0 +1,21 @@
+services:
+  app:
+    build: .
+    image: modelgate:dev
+    environment:
+      PORT: "8080"
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://127.0.0.1:8080/healthz', timeout=2)"]
+      interval: 2s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+
+  smoke:
+    image: curlimages/curl:8.22.0
+    depends_on:
+      app:
+        condition: service_healthy
+    command: ["-fsS", "http://app:8080/healthz"]
