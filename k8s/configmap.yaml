@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: modelgate-config
+data:
+  PORT: "8080"
+  UVICORN_LOG_LEVEL: "info"

@@ -83,3 +83,15 @@ Run the official marker after publishing:
 curl -fLsS https://raw.githubusercontent.com/inf345/inf345-week6-lab/main/mark_m3.py -o /tmp/mark_m3.py
 python3 /tmp/mark_m3.py --repo https://github.com/berikbp/modelgate
 ```
+
+## Kubernetes (M4)
+
+See [the deployment guide](docs/m4.md) for setup, configuration, and marker commands.
+The manifests in `k8s/` deploy two replicas of the published M3 image with HTTP
+health probes, resource limits, and a non-root, read-only container filesystem.
+
+The Kubernetes pull-request workflow runs the official M4 marker in a temporary
+kind cluster, including the frozen-process and random-port checks.
+
+The [drill 4 postmortem](docs/drill-4-postmortem.md) records the lab incident for
+Berik Satybaldy, student ID 240107019, Group B.
