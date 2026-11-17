@@ -18,7 +18,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: app
-          image: ghcr.io/berikbp/modelgate:19cdab9caa0bd67001b8be996a6fb09e65ec8d75
+          image: ghcr.io/berikbp/modelgate:93482e37dbf9772a45879053cb8cd8f17342c3ea
           ports:
             - name: http
               containerPort: 8080
