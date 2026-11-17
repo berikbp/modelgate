@@ -38,8 +38,10 @@ jobs:
         env:
           KIND_VERSION: v0.33.0
           KIND_SHA256: aee6151561422756b764a4ae28e7f44cda5af5a9eead3cc9985112b1de8d8e0d
-          KUBECTL_VERSION: v1.37.1
-          KUBECTL_SHA512: decde4d990d0fbf6451e65524dec42c549de3339f27005c45af8d3c61cca1de852524ebf2215c82be86d4ab2621c823f56f718b8d2c304b9100a903e696c0c32
+          # 1.37.1 failed the marker CRD wait with a nil status.conditions accessor.
+          # 1.36.1 passed that stage locally against the marker's Kubernetes 1.36.4.
+          KUBECTL_VERSION: v1.36.1
+          KUBECTL_SHA512: 0e3293367ed63e7f0792a32d3f8b96c586fc7920a6e078da99065dd425cf8123d62383680809157417fc183c566323a3e2d81098340d07d87ccd90750acc64c5
           HELM_VERSION: v4.2.1          # the Helm inside Argo CD 3.5.3
           HELM_SHA256: 479dca836e5b45e8bd222400c5591b0e3a647378f03ff96597180db97c17fdae
         run: |
