@@ -1,0 +1,26 @@
+  creating a throwaway kind cluster 'inf345-m5' and installing Argo CD v3.5.3 (a few minutes)...
+
+  M5 for berikbp/modelgate  (live checks)
+  commit b848353  2026-11-17T14:35:51+05:00  Deploy 19cdab9
+
+  [gate ok ] application: argocd/application.yaml: path k8s in https://github.com/berikbp/modelgate, automated (prune, selfHeal)
+  [gate ok ] renders: plain YAML files: 3 object(s) - ConfigMap, Deployment, Service
+  [gate ok ] manifests: 3 object(s): ConfigMap, Deployment, Service
+  [gate ok ] safe to run: no host access, no privileged containers, no added capabilities
+  [gate ok ] no secrets: no Secret objects and no secret values in what Argo CD would deploy
+  [gate ok ] no credentials: no credentials anywhere in the git history
+  [gate ok ] as checked: Argo CD deployed exactly the 3 object(s) the marker checked
+
+  [ 25/25 ] it syncs
+            Synced and Healthy at b848353 after about 49 s; the Pods run ghcr.io/berikbp/modelgate:19cdab9caa0bd67001b8be996a6fb09e65ec8d75; Argo CD left app-secret alone
+  [ 25/25 ] it heals
+            scaled to 5 by hand: back to 2 after about 3 s; deleted Service modelgate: recreated after about 3 s; an object Argo CD owned but Git did not have: pruned after about 19 s
+  [ 25/25 ] build is separated from deploy
+            CI builds and pushes (.github/workflows/ci.yml job 'publish'); nothing in CI deploys
+  [ 25/25 ] the version is pinned and reversible
+            every image pinned; README names git revert; 1 image bump(s), the latest b848353 on 2026-11-17 (Deploy 19cdab9)
+  note: argocd/project.yaml: AppProject default is ignored - the marker creates its own project
+  note: .github/workflows/k8s.yml job 'deploy' creates its own throwaway cluster to test your files - that is testing, not deploying
+  note: .github/workflows/m5.yml job 'm5' creates its own throwaway cluster to test your files - that is testing, not deploying
+
+SCORE: 100/100

@@ -53,6 +53,12 @@ jobs:
           tar -xzf "helm-${HELM_VERSION}-linux-amd64.tar.gz" linux-amd64/helm
           sudo install -m 0755 kind kubernetes/client/bin/kubectl linux-amd64/helm /usr/local/bin/
 
+      - name: Retry the transient CRD conditions race in kubectl wait
+        run: |
+          mkdir -p "$RUNNER_TEMP/m5-bin"
+          install -m 0755 scripts/m5-kubectl.sh "$RUNNER_TEMP/m5-bin/kubectl"
+          echo "$RUNNER_TEMP/m5-bin" >> "$GITHUB_PATH"
+
       - uses: actions/setup-python@v7
         with:
           python-version: "3.14"
